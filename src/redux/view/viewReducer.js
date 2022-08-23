@@ -2,7 +2,7 @@ import { IES, CLEAN_IES } from '../constants';
 
 // eslint-disable-next-line
 const INIT_STATE = {
-  ies: "",
+  ies: "Corporacion Educativa Del Litoral",
 };
 
 const ViewReducer = (state = INIT_STATE, action) => {

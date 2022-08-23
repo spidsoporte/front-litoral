@@ -1,24 +1,18 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router';
 import { Grid, Box, Card, Typography } from '@mui/material';
 import PageContainer from '../../components/container/PageContainer';
 import LogoAmericana from '../../assets/images/logos/Logo-Americana.png';
 import LogoLitoral from '../../assets/images/logos/Logo-Litoral.png';
-import { setIES } from '../../redux/view/Action';
 import Logo from '../../assets/images/Logo SPID/Logo.png';
 
 const Login = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const handleClick = (uid) => {
     if (uid === 1) {
-      dispatch(setIES('Corporacion Universitaria Americana'));
+      window.location.href = 'https://spid.americana.edu.co'
     } else if (uid === 2) {
-      dispatch(setIES('Corporacion Educativa Del Litoral'));
+      window.location.href = 'https://spid.litoral.edu.co'
     }
-    navigate('./login');
   };
   return (
     <PageContainer title="Login" description="this is Login page">
