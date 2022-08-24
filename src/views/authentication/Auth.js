@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router';
 import { Grid, Box, Card, Typography } from '@mui/material';
 import PageContainer from '../../components/container/PageContainer';
 import LogoAmericana from '../../assets/images/logos/Logo-Americana.png';
@@ -6,12 +7,13 @@ import LogoLitoral from '../../assets/images/logos/Logo-Litoral.png';
 import Logo from '../../assets/images/Logo SPID/Logo.png';
 
 const Login = () => {
+  const navigate = useNavigate()
 
   const handleClick = (uid) => {
     if (uid === 1) {
-      window.location.href = 'https://spid.americana.edu.co'
+      window.location.href = 'https://spid.americana.edu.co/auth/login'
     } else if (uid === 2) {
-      window.location.href = 'https://spid.litoral.edu.co'
+      navigate('./login');
     }
   };
   return (
