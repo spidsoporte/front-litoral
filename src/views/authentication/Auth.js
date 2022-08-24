@@ -8,14 +8,6 @@ import Logo from '../../assets/images/Logo SPID/Logo.png';
 
 const Login = () => {
   const navigate = useNavigate()
-
-  const handleClick = (uid) => {
-    if (uid === 1) {
-      window.location.href = 'https://spid.americana.edu.co/auth/login'
-    } else if (uid === 2) {
-      navigate('./login');
-    }
-  };
   return (
     <PageContainer title="Login" description="this is Login page">
       <Grid container spacing={0} sx={{ height: '100vh', justifyContent: 'center' }}>
@@ -39,9 +31,13 @@ const Login = () => {
                   }}
                 >
                   <Card
+                    component='a'
                     className="card-transition"
                     p="10px"
-                    onClick={() => handleClick(1)}
+                    href="https://spid.americana.edu.co/auth/login"
+                    sx={{
+                      textDecoration: 'none'
+                    }}
                   >
                     <img src={LogoAmericana} alt="Logo Americana" width="100%" />
                     <Box textAlign='center'>
@@ -50,7 +46,7 @@ const Login = () => {
                   </Card>
                   <Card
                     className="card-transition"
-                    onClick={() => handleClick(2)}
+                    onClick={() => navigate('./login')}
                   >
                     <img src={LogoLitoral} alt="Logo Litoral" width="100%" />
                     <Box textAlign='center'>
