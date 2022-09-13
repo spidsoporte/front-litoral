@@ -118,8 +118,11 @@ const Import = () => {
           const jDatos = [];
           for (let i = 0; i < data.length; i++) {
             const dato = data[i];
-            // const date = new Date(dato.fecha).todateLocaleDateString();
-            const date = new Date(excelEpoc + dato.fecha * msDay).toISOString()
+            let date = null
+            if (dato.fecha){
+              // const date = new Date(dato.fecha).todateLocaleDateString();
+              date = new Date(excelEpoc + dato.fecha * msDay).toISOString()
+            }
 
             jDatos.push({
               ...dato,
