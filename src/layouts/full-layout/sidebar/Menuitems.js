@@ -71,6 +71,12 @@ const Menuitems = [
     permissions: ['ADMINISTRADOR', 'DOCENTE', 'PSICOLOGO', 'COORDINADOR', 'EXTERNO'],
   },
   {
+    title: 'Reporte de Deserción',
+    icon: 'file-text',
+    href: '/desertions',
+    permissions: ['ADMINISTRADOR', 'DOCENTE', 'PSICOLOGO', 'COORDINADOR', 'EXTERNO'],
+  },
+  {
     title: 'Importaciones',
     icon: 'upload',
     href: '/tables',
