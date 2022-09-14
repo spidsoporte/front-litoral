@@ -1,4 +1,4 @@
-import { IES, CLEAN_IES } from '../constants';
+import { IES } from '../constants';
 
 // eslint-disable-next-line
 const INIT_STATE = {
@@ -11,11 +11,6 @@ const ViewReducer = (state = INIT_STATE, action) => {
       return {
         ...state,
         ies: action.payload,
-      };
-    case CLEAN_IES:
-      return {
-        ...state,
-        ies: '',
       };
     default:
       return state;

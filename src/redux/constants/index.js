@@ -18,4 +18,3 @@ export const LOGGED = 'LOGGED';
 export const LOGOUT = 'LOGOUT';
 // view constants
 export const IES = 'IES';
-export const CLEAN_IES = 'CLEAN_IES';

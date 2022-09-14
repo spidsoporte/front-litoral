@@ -8,7 +8,6 @@ const INIT_STATE = {
     },
   },
   isLogged: false,
-  date: ''
 };
 
 const AuthReducer = (state = INIT_STATE, action) => {
@@ -22,7 +21,6 @@ const AuthReducer = (state = INIT_STATE, action) => {
       return {
         ...state,
         isLogged: action.payload,
-        date: new Date()
       };
     case LOGOUT:
       return {
@@ -33,7 +31,6 @@ const AuthReducer = (state = INIT_STATE, action) => {
             rol: '',
           },
         },
-        date: ''
       };
     default:
       return state;

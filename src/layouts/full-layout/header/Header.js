@@ -6,8 +6,7 @@ import { AppBar, Box, IconButton, Toolbar, Menu, Typography, Avatar, Button } fr
 import PropTypes from 'prop-types';
 // Dropdown Component
 import ProfileDropdown from './ProfileDropdown';
-import { logout } from '../../../redux/auth/Action';
-import { cleanIES } from '../../../redux/view/Action';
+import { logout } from '../../../redux/auth/Action'; 
 // Logos
 import LogoAmericana from '../../../assets/images/logos/Logo-Americana.png';
 import LogoLitoral from '../../../assets/images/logos/Logo-Litoral.png';
@@ -177,7 +176,6 @@ const Header = ({ sx, customClass, toggleSidebar, toggleMobileSidebar }) => {
               color="primary"
               onClick={() => {
                 dispatch(logout());
-                dispatch(cleanIES());
               }}
             >
               Cerrar Sesion
