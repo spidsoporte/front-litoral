@@ -291,20 +291,22 @@ const Students = () => {
                           <IconButton color="primary" onClick={() => modal(student)}>
                             <FeatherIcon icon="edit" width="24" height="24" />
                           </IconButton>
-                          <IconButton
-                            onClick={() => handleDelete(student.uid)}
-                            disabled={student.uid === User.uid}
-                            sx={{
-                              marginLeft: '10px',
-                            }}
-                          >
-                            <FeatherIcon
-                              icon="trash"
-                              width="24"
-                              height="24"
-                              color={student.uid === User.uid ? 'pink' : 'red'}
-                            />
-                          </IconButton>
+                          {User.rol === 'ADMINISTRADOR' && (
+                            <IconButton
+                              onClick={() => handleDelete(student.uid)}
+                              disabled={student.uid === User.uid}
+                              sx={{
+                                marginLeft: '10px',
+                              }}
+                            >
+                              <FeatherIcon
+                                icon="trash"
+                                width="24"
+                                height="24"
+                                color={student.uid === User.uid ? 'pink' : 'red'}
+                              />
+                            </IconButton>
+                          )}
                         </Box>
                       </TableCell>
                     </TableRow>
