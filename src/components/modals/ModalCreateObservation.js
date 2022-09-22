@@ -30,7 +30,7 @@ const reasons = [
   'Traslado de Pais',
   'Estudiante fallecido',
   'Desconocido',
-  'Otro',
+  'Otros',
 ];
 const stateContacts = ['Contactado', 'No Contactado'];
 
@@ -39,7 +39,6 @@ export default function ModalCreateObservation({ statusAttendance, uid, open, ha
   const { user } = useSelector((state) => state.auth.user);
 
   const [dataForm, setDataForm] = React.useState({});
-  const [otherReason, setOtherReason] = React.useState('');
 
   React.useEffect(() => {
     setDataForm({ id_student: uid, id_user: user.uid, status_attendance: statusAttendance });
@@ -51,11 +50,7 @@ export default function ModalCreateObservation({ statusAttendance, uid, open, ha
 
   const handleSubmit = async () => {
     AlertCharging();
-    let data = dataForm
-    if(otherReason !== ''){
-      data = {...data, reason: otherReason}
-    }
-    const res = await FetchTokenized('student/observations-create', token, data, 'POST');
+    const res = await FetchTokenized('student/observations-create', token, dataForm, 'POST');
     const body = await res.json();
     Swal.close();
 
@@ -90,7 +85,6 @@ export default function ModalCreateObservation({ statusAttendance, uid, open, ha
                 value={dataForm.reason ? dataForm.reason : ''}
                 onChange={(e) => {
                   handleChange(e)
-                  setOtherReason('')
                 }}
                 MenuProps={{
                   PaperProps: {
@@ -110,28 +104,6 @@ export default function ModalCreateObservation({ statusAttendance, uid, open, ha
                 ))}
               </Select>
             </FormControl>
-            {dataForm.reason === 'Otro' && (
-              <FormControl fullWidth>
-                <CustomFormLabel
-                  sx={{
-                    mt: 0,
-                  }}
-                  htmlFor="otherReason"
-                >
-                  Cual?
-                </CustomFormLabel>
-                <CustomTextField
-                  id="otherReason"
-                  name="otherReason"
-                  variant="outlined"
-                  fullWidth
-                  size="small"
-                  value={otherReason}
-                  onChange={(e) => setOtherReason(e.target.value)}
-                  required
-                />
-              </FormControl>
-            )}
             <FormControl fullWidth size="small" sx={{ marginY: '10px' }}>
               <InputLabel id="state_contact">Estado de contacto</InputLabel>
               <Select

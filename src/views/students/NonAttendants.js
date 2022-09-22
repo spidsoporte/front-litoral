@@ -16,6 +16,7 @@ import {
   Button,
   MenuItem,
   Avatar,
+  Chip,
   IconButton,
   TableFooter,
   TablePagination,
@@ -472,7 +473,23 @@ const NonAttendance = () => {
                           <Typography>{student.reason}</Typography>
                         </TableCell>
                         <TableCell align="center">
-                          <Typography>{student.state_contact}</Typography>
+                          <Chip
+                            sx={{
+                              backgroundColor:
+                                student.state_contact === 'Contactado'
+                                ? (theme) => theme.palette.success.main
+                                : student.state_contact === 'No Contactado'
+                                  ? (theme) => theme.palette.danger.main
+                                  : (theme) => theme.palette.grey.A100,
+                              color: 
+                                student.state_contact === 'Sin Datos'
+                                ? '#000'
+                                : '#fff',
+                              borderRadius: '6px',
+                            }}
+                            size="small"
+                            label={student.state_contact}
+                          />
                         </TableCell>
                         <TableCell align="center">
                           <Box display="flex" alignItems="center" justifyContent="center">

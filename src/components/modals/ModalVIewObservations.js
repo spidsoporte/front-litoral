@@ -52,7 +52,12 @@ export default function ModalViewObservations({ uid, open, handleClose }) {
     if (body.statusCode === 401) {
       dispatch(logout());
     }
-    setData(body.observation);
+    if (body.statusCode === 200) {
+      setData(body.observation);
+    }
+    if (body.statusCode === 400) {
+      AlertError('Error en la peticion')
+    }
   };
 
   React.useEffect(() => {
