@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-unneeded-ternary */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-return-assign */
@@ -34,6 +35,7 @@ import ModalViewObservations from '../../components/modals/ModalVIewObservations
 import ModalInfoStudent from '../../components/modals/ModalInfoStudent';
 import ModalViewResults from '../../components/modals/ModalViewResults';
 import { logout } from '../../redux/auth/Action';
+import { AlertError } from '../../components/SweetAlerts/Alerts';
 
 
 const BCrumb = [
@@ -75,6 +77,10 @@ const NonAttendance = () => {
     {
       value: 3,
       label: 'Rojo',
+    },
+    {
+      value: 4,
+      label: 'Desertor',
     },
   ]);
   // Pagination
@@ -150,11 +156,16 @@ const NonAttendance = () => {
     const url = 'student/filter-absence?since='+sinc+'&limit='+lim;
     const res = await FetchTokenized(url, token, data, 'POST');
     const body = await res.json();
+    if (body.statusCode === 200) {
+      setStudents(body.students);
+      setTotal(body.total);
+    }
     if (body.statusCode === 401) {
       dispatch(logout());
     }
-    setStudents(body.students);
-    setTotal(body.total);
+    if (body.statusCode === 400) {
+      AlertError(`Error en la peticion ${body.msg}`);
+    }
   };
 
   const handleChange = (e) => {
@@ -399,6 +410,12 @@ const NonAttendance = () => {
                       <Typography variant="h5">Estado</Typography>
                     </TableCell>
                     <TableCell align="center">
+                      <Typography variant="h5">Motivo</Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Typography variant="h5">Contacto</Typography>
+                    </TableCell>
+                    <TableCell align="center">
                       <Typography variant="h5">Opciones</Typography>
                     </TableCell>
                   </TableRow>
@@ -419,7 +436,7 @@ const NonAttendance = () => {
                       colorStatus = ['success.main', 'warning.main', 'danger.main', 'dark.main'];
                     }
                     return (
-                      <TableRow key={student.uid}>
+                      <TableRow key={student._id}>
                         <TableCell align="center">
                           <Typography>{student.identificacion}</Typography>
                         </TableCell>
@@ -452,6 +469,12 @@ const NonAttendance = () => {
                           <Typography>{student.estado_de_estudiante}</Typography>
                         </TableCell>
                         <TableCell align="center">
+                          <Typography>{student.reason}</Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Typography>{student.state_contact}</Typography>
+                        </TableCell>
+                        <TableCell align="center">
                           <Box display="flex" alignItems="center" justifyContent="center">
                             <IconButton
                               color="secondary"
@@ -461,13 +484,13 @@ const NonAttendance = () => {
                             </IconButton>
                             <IconButton
                               color="primary"
-                              onClick={() => modalViewObservation(student.uid)}
+                              onClick={() => modalViewObservation(student._id)}
                             >
                               <FeatherIcon icon="eye" width="24" height="24" />
                             </IconButton>
                             <IconButton
                               color="warning"
-                              onClick={() => modalCreateObservation(student.uid, student.status)}
+                              onClick={() => modalCreateObservation(student._id, student.status)}
                             >
                               <FeatherIcon icon="edit-3" width="24" height="24" />
                             </IconButton>
@@ -501,7 +524,7 @@ const NonAttendance = () => {
                   <TableRow>
                     <TablePagination
                       rowsPerPageOptions={[5, 10, 25, { label: 'Todos', value: total }]}
-                      colSpan={6}
+                      colSpan={8}
                       count={total || 0}
                       rowsPerPage={limit || 0}
                       page={page}
