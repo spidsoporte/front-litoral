@@ -35,7 +35,7 @@ const BCrumb = [
 
 const initSelect = [
   {
-    value: undefined,
+    value: 'Todos',
     label: 'Todos',
   },
 ];
@@ -101,7 +101,13 @@ const DesertionReport = () => {
   };
 
   const handleChange = (e) => {
-    setDataSelects({ ...dataSelects, [e.target.name]: e.target.value });
+    if (e.target.value === 'Todos'){
+      setDataSelects({ ...dataSelects, [e.target.name]: undefined });
+      delete dataSelects.program
+    }else{
+      setDataSelects({ ...dataSelects, [e.target.name]: e.target.value });
+    }
+
   };
 
   return (

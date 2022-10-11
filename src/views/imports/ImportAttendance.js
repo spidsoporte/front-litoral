@@ -121,7 +121,22 @@ const Import = () => {
             let date = null
             if (dato.fecha){
               // const date = new Date(dato.fecha).todateLocaleDateString();
-              date = new Date(excelEpoc + dato.fecha * msDay).toISOString()
+              const dateConvert = new Date(excelEpoc + dato.fecha * msDay)
+              const dateParse = Date.parse(dateConvert)
+              const finaldate = new Date(dateParse)
+              
+              const year = finaldate.getUTCFullYear()
+              let month = finaldate.getUTCMonth()+1
+              let day = finaldate.getUTCDate()
+
+              if (month < 10){
+                month = `0${month}`
+              }
+              if (day < 10){
+                day = `0${day}`
+              }
+
+              date = `${year}-${month}-${day}`
             }
 
             jDatos.push({
@@ -219,7 +234,7 @@ const Import = () => {
       }
     }
   };
-  console.log(errors);
+
   const handleDelete = (i) => {
     files.splice(i, 1);
     setRender(!render);

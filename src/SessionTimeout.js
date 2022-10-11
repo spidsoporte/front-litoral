@@ -25,7 +25,7 @@ const SessionTimeout = () => {
       const storedTimeStamp = sessionStorage.getItem('lastTimeStamp');
       warningInactive(storedTimeStamp);
       alert = AlertSession(handleClose)
-    }, 600000);
+    }, 540000);
   };
   
   // warning timer
@@ -33,7 +33,7 @@ const SessionTimeout = () => {
     clearTimeout(startTimerInterval.current);
     
     warningInactiveInterval.current = setInterval(() => {
-      const maxTime = 1;
+      const maxTime = 10;
       const popTime = 1;
       
       const diff = moment.duration(moment().diff(moment(timeString)));
@@ -49,11 +49,11 @@ const SessionTimeout = () => {
       }
       
       if (minPast === maxTime) {
+        console.log('siu');
         clearInterval(warningInactiveInterval.current);
         setOpen(false);
         sessionStorage.removeItem('lastTimeStamp');
         dispatch(logout());
-        window.location.reload()
       }
     }, 1000);
   };

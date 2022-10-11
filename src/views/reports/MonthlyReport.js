@@ -60,10 +60,12 @@ const MonthlyReport = () => {
     if (body.statusCode === 401) {
       dispatch(logout());
     }
-    const insti = body.Institutions;
-    for (let i = 0; i < insti.length; i++) {
-      // eslint-disable-next-line no-shadow
-      setInstitutions((institutions) => [...institutions, { value: insti[i], label: insti[i] }]);
+    if (body.statusCode === 200) {
+      const insti = body.Institutions;
+      for (let i = 0; i < insti.length; i++) {
+        // eslint-disable-next-line no-shadow
+        setInstitutions((institutions) => [...institutions, { value: insti[i], label: insti[i] }]);
+      }
     }
   };
   const handleProgram = async () => {
@@ -259,7 +261,7 @@ const MonthlyReport = () => {
                     Generar Reporte
                   </Button>
                   <Button
-                    href={`${url}user/dowmload-RecordsMonthly/${fileName}`}
+                    href={`${url}user/dowmload-Records/${fileName}`}
                     variant="contained"
                     color="primary"
                     disabled={!dowmload}
