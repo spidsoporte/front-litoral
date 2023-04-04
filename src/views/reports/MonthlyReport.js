@@ -54,7 +54,7 @@ const MonthlyReport = () => {
   const dispatch = useDispatch();
 
   const handleInstitution = async () => {
-    const data = { ies: dataSelects.ies };
+    const data = {};
     const res = await FetchTokenized('student/filter-institutions', token, data, 'POST');
     const body = await res.json();
     if (body.statusCode === 401) {
@@ -69,7 +69,7 @@ const MonthlyReport = () => {
     }
   };
   const handleProgram = async () => {
-    const data = { ies: dataSelects.ies, ied: dataSelects.institution };
+    const data = { ied: dataSelects.institution };
     const res = await FetchTokenized('student/filter-programs', token, data, 'POST');
     const body = await res.json();
     const pro = body.programs;
@@ -80,7 +80,6 @@ const MonthlyReport = () => {
   };
   const handleGroup = async () => {
     const data = {
-      ies: dataSelects.ies,
       ied: dataSelects.institution,
       programa_academico: dataSelects.program,
     };
@@ -96,7 +95,6 @@ const MonthlyReport = () => {
   const handleSubmit = async () => {
     AlertCharging();
     const data = {
-      ies: dataSelects.ies,
       ied: dataSelects.institution,
       programa_academico: dataSelects.program,
       grupo: dataSelects.group,

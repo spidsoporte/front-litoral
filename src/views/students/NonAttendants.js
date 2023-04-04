@@ -99,7 +99,7 @@ const NonAttendance = () => {
   const dispatch = useDispatch()
 
   const handleInstitution = async () => {
-    const data = { ies: dataSelects.ies };
+    const data = {};
     const res = await FetchTokenized('student/filter-institutions', token, data, 'POST');
     const body = await res.json();
     if (body.statusCode === 401) {
@@ -112,7 +112,7 @@ const NonAttendance = () => {
     }
   };
   const handleProgram = async () => {
-    const data = { ies: dataSelects.ies, ied: dataSelects.institution };
+    const data = { ied: dataSelects.institution };
     const res = await FetchTokenized('student/filter-programs', token, data, 'POST');
     const body = await res.json();
     const pro = body.programs;
@@ -123,7 +123,6 @@ const NonAttendance = () => {
   };
   const handleGroup = async () => {
     const data = {
-      ies: dataSelects.ies,
       ied: dataSelects.institution,
       programa_academico: dataSelects.program,
     };
@@ -146,7 +145,6 @@ const NonAttendance = () => {
     }
 
     const data = {
-      ies: dataSelects.ies,
       ied: dataSelects.institution,
       programa_academico: dataSelects.program,
       grupo: dataSelects.group,

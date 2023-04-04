@@ -51,11 +51,8 @@ const initSelect = [
 
 const Attendance = () => {
   const { token } = useSelector((state) => state.auth.user);
-  const { ies: IED } = useSelector((state) => state.auth.user.user);
   const [students, setStudents] = React.useState([]);
-  const [dataSelects, setDataSelects] = React.useState({
-    ies: IED,
-  });
+  const [dataSelects, setDataSelects] = React.useState({});
   const [institutions, setInstitutions] = React.useState(initSelect);
   const [programs, setPrograms] = React.useState(initSelect);
   const [groups, setGroups] = React.useState(initSelect);
@@ -100,7 +97,7 @@ const Attendance = () => {
   const fulDate = `${day}-${month}-${year}`;
 
   const handleInstitution = async () => {
-    const data = { ies: dataSelects.ies };
+    const data = {};
     const res = await FetchTokenized('student/filter-institutions', token, data, 'POST');
     const body = await res.json();
     if (body.statusCode === 401) {
@@ -113,7 +110,7 @@ const Attendance = () => {
     }
   };
   const handleProgram = async () => {
-    const data = { ies: dataSelects.ies, ied: dataSelects.institution };
+    const data = { ied: dataSelects.institution };
     const res = await FetchTokenized('student/filter-programs', token, data, 'POST');
     const body = await res.json();
     const pro = body.programs;
@@ -124,7 +121,6 @@ const Attendance = () => {
   };
   const handleGroup = async () => {
     const data = {
-      ies: dataSelects.ies,
       ied: dataSelects.institution,
       programa_academico: dataSelects.program,
     };
@@ -148,7 +144,6 @@ const Attendance = () => {
     }
 
     const data = {
-      ies: dataSelects.ies,
       ied: dataSelects.institution,
       programa_academico: dataSelects.program,
       grupo: dataSelects.group,
@@ -188,15 +183,19 @@ const Attendance = () => {
     AlertCharging();
     const res = await FetchTokenized('student/absence', token, attendance, 'POST');
     const body = await res.json();
-    if (body.msg === 'asistencia exitosa') {
+    if (body.statusCode === 200) {
       AlertSuccess('Asistencia registrada');
-      setDataSelects({
-        ies: IED,
-      });
+      setDataSelects({});
       setStudents([]);
     }
-    if (body.msg === 'asistencia erronea') {
+    if (body.statusCode === 404) {
       AlertError('Esta asistencia ya ha sido registrada');
+    }
+    if (body.statusCode === 400) {
+      AlertError(body.msg);
+    }
+    if (body.statusCode === 500) {
+      AlertError(body.msg);
     }
   };
 

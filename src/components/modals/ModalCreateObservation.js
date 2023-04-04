@@ -13,7 +13,7 @@ import Slide from '@mui/material/Slide';
 import { FormControl, InputLabel, MenuItem, OutlinedInput, Select } from '@mui/material';
 import CustomFormLabel from '../forms/custom-elements/CustomFormLabel';
 import CustomTextField from '../forms/custom-elements/CustomTextField';
-import { AlertCharging, AlertSuccess } from '../SweetAlerts/Alerts';
+import { AlertCharging, AlertError, AlertSuccess } from '../SweetAlerts/Alerts';
 import { FetchTokenized } from '../../services/Fetch';
 
 const Transition = React.forwardRef((props, ref) => {
@@ -54,12 +54,18 @@ export default function ModalCreateObservation({ statusAttendance, uid, open, ha
     const body = await res.json();
     Swal.close();
 
-    if (body.msg === 'successful observation') {
+    if (body.statusCode === 200) {
       AlertSuccess('Observacion registrada');
       setTimeout(() => {
         setDataForm({});
         handleClose();
       }, 2000);
+    }
+    if (body.statusCode === 400) {
+      AlertError(body.msg || body.message);
+    }
+    if (body.statusCode === 500) {
+      AlertError(body.msg || body.message);
     }
   };
 

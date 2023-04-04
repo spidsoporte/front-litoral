@@ -118,25 +118,25 @@ const Import = () => {
           const jDatos = [];
           for (let i = 0; i < data.length; i++) {
             const dato = data[i];
-            let date = null
-            if (dato.fecha){
+            let date = null;
+            if (dato.fecha) {
               // const date = new Date(dato.fecha).todateLocaleDateString();
-              const dateConvert = new Date(excelEpoc + dato.fecha * msDay)
-              const dateParse = Date.parse(dateConvert)
-              const finaldate = new Date(dateParse)
-              
-              const year = finaldate.getUTCFullYear()
-              let month = finaldate.getUTCMonth()+1
-              let day = finaldate.getUTCDate()
+              const dateConvert = new Date(excelEpoc + dato.fecha * msDay);
+              const dateParse = Date.parse(dateConvert);
+              const finaldate = new Date(dateParse);
 
-              if (month < 10){
-                month = `0${month}`
+              const year = finaldate.getUTCFullYear();
+              let month = finaldate.getUTCMonth() + 1;
+              let day = finaldate.getUTCDate();
+
+              if (month < 10) {
+                month = `0${month}`;
               }
-              if (day < 10){
-                day = `0${day}`
+              if (day < 10) {
+                day = `0${day}`;
               }
 
-              date = `${year}-${month}-${day}`
+              date = `${year}-${month}-${day}`;
             }
 
             jDatos.push({
@@ -162,7 +162,7 @@ const Import = () => {
   };
 
   const handleImport = async () => {
-    setValidate(false)
+    setValidate(false);
     for (let i = 0; i < dataFiles.length; i++) {
       const file = dataFiles[i];
       const error = [];
@@ -227,9 +227,8 @@ const Import = () => {
         if (body.msg === 'Excel denied') {
           setErrorsValidate((errorsValidate) => [...errorsValidate, body.datatemp]);
           handleNext();
-        }
-        if (body.msg === 'Duplicate attendance') {
-          AlertError('Esta asistencia ya se encuentra registrada');
+        } else {
+          AlertError(body.msg);
         }
       }
     }
@@ -603,25 +602,25 @@ const Import = () => {
                     Validar excel
                   </Button>
                 )}
-                {activeStep === steps.length - 1 && validate &&(
+                {activeStep === steps.length - 1 && validate && (
                   <Button
-                  onClick={activeStep === steps.length - 1 ? handleImport : handlePreview}
-                  variant="contained"
-                  color={activeStep === steps.length - 1 ? 'success' : 'primary'}
-                  disabled={files.length === 0}
-                >
-                  {activeStep === steps.length - 1 ? 'Importar' : 'Siguiente'}
-                </Button>
+                    onClick={activeStep === steps.length - 1 ? handleImport : handlePreview}
+                    variant="contained"
+                    color={activeStep === steps.length - 1 ? 'success' : 'primary'}
+                    disabled={files.length === 0}
+                  >
+                    {activeStep === steps.length - 1 ? 'Importar' : 'Siguiente'}
+                  </Button>
                 )}
-                {activeStep === 0 &&(
+                {activeStep === 0 && (
                   <Button
-                  onClick={activeStep === steps.length - 1 ? handleImport : handlePreview}
-                  variant="contained"
-                  color={activeStep === steps.length - 1 ? 'success' : 'primary'}
-                  disabled={files.length === 0}
-                >
-                  {activeStep === steps.length - 1 ? 'Importar' : 'Siguiente'}
-                </Button>
+                    onClick={activeStep === steps.length - 1 ? handleImport : handlePreview}
+                    variant="contained"
+                    color={activeStep === steps.length - 1 ? 'success' : 'primary'}
+                    disabled={files.length === 0}
+                  >
+                    {activeStep === steps.length - 1 ? 'Importar' : 'Siguiente'}
+                  </Button>
                 )}
               </Box>
             </>

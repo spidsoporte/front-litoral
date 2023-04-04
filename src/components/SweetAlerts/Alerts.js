@@ -37,13 +37,13 @@ export const AlertSuccess = (message, time) => {
   return alerta;
 };
 
-export const AlertCharging = () => {
+export const AlertCharging = (message) => {
   const alerta = Swal.fire({
     customClass: {
       container: 'z-index',
     },
     title: 'Cargando',
-    html: 'Por favor espera un momento...',
+    html: message || 'Por favor espera un momento...',
     allowOutsideClick: false,
     didOpen: () => {
       Swal.showLoading();
@@ -78,7 +78,7 @@ export const AlertSession = (handle) => {
     didOpen: () => {
       const b = Swal.getHtmlContainer().querySelector('b');
       timerInterval = setInterval(() => {
-        const time = (Swal.getTimerLeft() / 1000).toFixed(0)
+        const time = (Swal.getTimerLeft() / 1000).toFixed(0);
         // eslint-disable-next-line prefer-destructuring
         b.textContent = time;
       }, 100);
@@ -92,7 +92,7 @@ export const AlertSession = (handle) => {
       console.log('I was closed by the timer');
     }
     if (result.isConfirmed) {
-      handle()
+      handle();
     }
   });
 

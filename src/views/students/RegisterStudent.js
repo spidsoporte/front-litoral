@@ -42,9 +42,8 @@ const BCrumb = [
 const RegisterStudent = () => {
   const { token } = useSelector((state) => state.auth.user);
   const { ies: Ies } = useSelector((state) => state.view);
-  const initialData = { ies: Ies };
 
-  const [dataForm, setDataForm] = useState(initialData);
+  const [dataForm, setDataForm] = useState({});
   const [institutions, setInstitutions] = React.useState([]);
   const [programs, setPrograms] = React.useState([]);
   const [groups, setGroups] = React.useState([]);
@@ -109,7 +108,6 @@ const RegisterStudent = () => {
 
   const handleProgram = async (value) => {
     const data = {
-      ies: dataForm.ies,
       ied: value,
     };
     const res = await FetchTokenized('student/filter-programs', token, data, 'POST');
@@ -135,14 +133,12 @@ const RegisterStudent = () => {
   // eslint-disable-next-line no-unused-vars
   const handleGroup = async (value) => {
     const data = {
-      ies: dataForm.ies,
       ied: dataForm.ied,
       programa_academico: value,
     };
     const res = await FetchTokenized('student/filter-groups', token, data, 'POST');
     const body = await res.json();
     const grou = body.groups;
-    console.log(groups);
     for (let i = 0; i < grou.length; i++) {
       // eslint-disable-next-line no-shadow
       setGroups((groups) => [...groups, { value: grou[i], label: grou[i] }]);
@@ -173,7 +169,7 @@ const RegisterStudent = () => {
       Swal.close();
       if (body.msg === 'Registro exitoso') {
         AlertSuccess('Estudiante Registrado exitosamente');
-        setDataForm(initialData);
+        setDataForm({});
       }
       if (body.msg === 'This student already exists in the db') {
         AlertError('Esta cedula o correo ya existe');

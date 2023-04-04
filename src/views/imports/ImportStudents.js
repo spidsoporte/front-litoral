@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable array-callback-return */
 /* eslint-disable no-shadow */
@@ -27,7 +28,7 @@ import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import FeatherIcon from 'feather-icons-react';
 import { useDispatch, useSelector } from 'react-redux';
 import Swal from 'sweetalert2';
-import { AlertCharging, AlertProgress, AlertSuccess } from '../../components/SweetAlerts/Alerts';
+import { AlertCharging, AlertError, AlertSuccess } from '../../components/SweetAlerts/Alerts';
 import excelIcon from '../../assets/images/iconos/icons8-microsoft-excel.svg';
 import PageContainer from '../../components/container/PageContainer';
 import Breadcrumb from '../../layouts/full-layout/breadcrumb/Breadcrumb';
@@ -84,14 +85,30 @@ const Import = () => {
         setFileError(true);
       }
     }
+    document.querySelector('#file').value = null;
+  };
+
+  const parseDate = (date) => {
+    const year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+
+    // agregacion del 0 al inicio cuando el numero es de un solo digito
+    if (month < 10) {
+      month = `0${month}`;
+    }
+    if (day < 10) {
+      day = `0${day}`;
+    }
+
+    // devolvemos la fecha en string con el formato yyyy/mm/dd
+    return `${year}-${month}-${day}`;
   };
 
   const handlePreview = async () => {
     handleNext();
     for (let i = 0; i < files.length; i++) {
-      AlertCharging();
-      const excelEpoc = new Date(1900, 0, -1).getTime();
-      const msDay = 86400000;
+      AlertCharging('Este proceso puede demorar unos minutos, por favor espere...');
       // eslint-disable-next-line no-await-in-loop
       const promise = new Promise((resolve, reject) => {
         const fileReader = new FileReader();
@@ -100,27 +117,27 @@ const Import = () => {
 
         fileReader.onload = (e) => {
           const bufferArray = e.target.result;
-          const wb = XLSX.read(bufferArray, { type: 'buffer' });
+          const wb = XLSX.read(bufferArray, { type: 'buffer', cellDates: true });
           const wsname = wb.SheetNames[0];
           const ws = wb.Sheets[wsname];
           const data = XLSX.utils.sheet_to_json(ws);
 
-          const jDatos = [];
-          for (let i = 0; i < data.length; i++) {
-            const dato = data[i];
-            let date = null
-            if (dato['Fecha de Nacimiento']) {
-              // const date = new Date(dato.fecha).todateLocaleDateString();
-              date = new Date(excelEpoc + dato['Fecha de Nacimiento'] * msDay).toISOString();
-            }
-
-            jDatos.push({
-              ...dato,
-              'Fecha de Nacimiento': date,
+          // Se convierten todos los valores y fechas a string
+          data.forEach((object) => {
+            Object.keys(object).forEach((key) => {
+              if (typeof object[key] === 'object') {
+                object[key] = parseDate(object[key]);
+              } else if (key === 'IES') {
+                object[key] = object[key].replace(/(\w)(\S*)/g, (g0, g1, g2) => {
+                  return g1.toUpperCase() + g2.toLowerCase();
+                });
+              } else {
+                object[key] = object[key].toString();
+              }
             });
-          }
+          });
 
-          resolve(jDatos);
+          resolve(data);
         };
 
         fileReader.onerror = (error) => {
@@ -133,24 +150,33 @@ const Import = () => {
         Swal.close();
       });
     }
+
     AlertSuccess('Excel Convertido', 1000);
   };
 
   const handleImport = async () => {
     for (let i = 0; i < dataFiles.length; i++) {
       const file = dataFiles[i];
-      const error = [];
-      AlertProgress(file.length, 0);
-      for (let j = 0; j < file.length; j++) {
-        const res = await FetchTokenized('student/upload/', token, file[j], 'POST');
-        const body = await res.json();
-        if (body.statusCode === 401) {
-          dispatch(logout());
-        }
-        if (body.msg === 'error! al subir data') {
-          error.push(body);
-        }
-        Swal.update({ html: `${j + 1} - ${file.length}` });
+      let error = {};
+      AlertCharging('Este proceso puede tardar unos minutos, por favor espere...');
+      const res = await FetchTokenized('student/upload/', token, file, 'POST').catch((err) =>
+        AlertError(err),
+      );
+      const body = await res.json();
+      if (body.statusCode === 401) {
+        dispatch(logout());
+      }
+      if (body.statusCode === 400) {
+        error = body.datatemp;
+      }
+      if (body.statusCode === 410) {
+        error = body.datatemp;
+      }
+      if (body.statusCode === 500) {
+        error = { 
+          'Error de cargue': [{ 'Consultar con administrador': {} }] 
+        };
+        AlertError(body.msg);
       }
       setErrors((errors) => [...errors, error]);
       Swal.close();
@@ -310,6 +336,8 @@ const Import = () => {
     },
   ];
 
+  console.log(errors);
+
   return (
     <PageContainer title="SPID | Importacion">
       <Breadcrumb title="Importar Estudiantes (Excel)" items={BCrumb} />
@@ -366,7 +394,7 @@ const Import = () => {
               {errors.map((error, i) => (
                 <Box
                   sx={
-                    error.length === 0
+                    !Object.keys(error).length
                       ? {
                           m: 3,
                           p: 2,
@@ -402,17 +430,21 @@ const Import = () => {
                     </Typography>
                   </Box>
                   <Box sx={{ marginTop: '30px' }}>
-                    <b>({error.length}) Error(es) encontrado(s)</b>
+                    <b>
+                      {Object.keys(error).length
+                        ? 'Errores encontrados'
+                        : 'No se encontraron errores'}
+                    </b>
                     <Box>
-                      {error.map((err) => (
-                        <ListItem>
-                          {err.datatemp[0].identificacin} - {err.datatemp[0].nombrecompleto}
-                          <Typography marginLeft="auto">
-                            {err.typeError === 'the student exists'
-                              ? 'Datos del estudiante duplicados'
-                              : 'Estructura de los datos invalida'}
-                          </Typography>
-                        </ListItem>
+                      {Object.keys(error).map((key) => (
+                        <Box>
+                          {error[key].map((err) => (
+                            <ListItem>
+                              {err.identificacin} - {err.nombrecompleto}
+                              <Typography marginLeft="auto">{key}</Typography>
+                            </ListItem>
+                          ))}
+                        </Box>
                       ))}
                     </Box>
                   </Box>
@@ -428,7 +460,6 @@ const Import = () => {
           ) : (
             <>
               <Box>{handleSteps(activeStep)}</Box>
-
               <Box display="flex" sx={{ flexDirection: 'row', p: 3 }}>
                 <Button
                   color="inherit"

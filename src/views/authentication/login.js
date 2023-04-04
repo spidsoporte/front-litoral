@@ -29,7 +29,6 @@ const Login = () => {
   const [user, setUser] = useState({
     email: '',
     password: '',
-    ies: IES,
   });
   const [showPassword, setShowPassword] = useState(false);
 

@@ -53,7 +53,7 @@ const DesertionReport = () => {
   const dispatch = useDispatch();
 
   const handleInstitution = async () => {
-    const data = { ies: dataSelects.ies };
+    const data = {};
     const res = await FetchTokenized('student/filter-institutions', token, data, 'POST');
     const body = await res.json();
     if (body.statusCode === 401) {
@@ -66,7 +66,7 @@ const DesertionReport = () => {
     }
   };
   const handleProgram = async () => {
-    const data = { ies: dataSelects.ies, ied: dataSelects.institution };
+    const data = { ied: dataSelects.institution };
     const res = await FetchTokenized('student/filter-programs', token, data, 'POST');
     const body = await res.json();
     const pro = body.programs;
@@ -79,7 +79,6 @@ const DesertionReport = () => {
   const handleSubmit = async () => {
     AlertCharging();
     const data = {
-      ies: dataSelects.ies,
       ied: dataSelects.institution,
       programa_academico: dataSelects.program,
     };
@@ -107,7 +106,6 @@ const DesertionReport = () => {
     }else{
       setDataSelects({ ...dataSelects, [e.target.name]: e.target.value });
     }
-
   };
 
   return (

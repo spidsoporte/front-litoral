@@ -16,21 +16,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {
-  Card,
-  FormControl,
-  InputAdornment,
-  MenuItem,
-  OutlinedInput,
-  Typography,
-  Box,
-  IconButton,
-  Grid,
-  Chip,
-  Avatar,
-} from '@mui/material';
-import CustomFormLabel from '../forms/custom-elements/CustomFormLabel';
+import SendIcon from '@mui/icons-material/Send';
+import { Card, MenuItem, Typography, Box, IconButton, Chip, Avatar } from '@mui/material';
 import CustomSelect from '../forms/custom-elements/CustomSelect';
+import CustomFormLabel from '../forms/custom-elements/CustomFormLabel';
 import { AlertCharging, AlertError, AlertSuccess } from '../SweetAlerts/Alerts';
 import { FetchTokenized } from '../../services/Fetch';
 import { logout } from '../../redux/auth/Action';
@@ -42,26 +31,56 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function ModalViewObservations({ uid, open, handleClose }) {
   const { token } = useSelector((state) => state.auth.user);
   const { user } = useSelector((state) => state.auth.user);
-  const [data, setData] = React.useState([{}]);
+  const [data, setData] = React.useState([]);
+  const [years, setYears] = React.useState([]);
+  const [date, setDate] = React.useState('');
+  const [semester, setSemester] = React.useState('');
   const dispatch = useDispatch();
 
   const handleList = async () => {
-    const student = { id_student: uid };
+    const student = { id_student: uid, date, periodo: semester };
     const res = await FetchTokenized('student/observations-list', token, student, 'POST');
     const body = await res.json();
     if (body.statusCode === 401) {
       dispatch(logout());
     }
     if (body.statusCode === 200) {
-      setData(body.observation);
+      setData(body.observationDate);
     }
     if (body.statusCode === 400) {
-      AlertError('Error en la peticion')
+      AlertError(body.msg || body.message);
+    }
+    if (body.statusCode === 410) {
+      AlertError(body.msg || body.message);
+    }
+  };
+
+  const handleListYears = async () => {
+    const res = await FetchTokenized('student/observations-list-a', token);
+    const body = await res.json();
+    if (body.statusCode === 401) {
+      dispatch(logout());
+    }
+    if (body.statusCode === 200) {
+      setYears(body.fecha);
+    }
+    if (body.statusCode === 400) {
+      AlertError('Error en la peticion');
+    }
+    if (body.statusCode === 410) {
+      AlertError('Contactar con soporte');
     }
   };
 
   React.useEffect(() => {
-    handleList();
+    if (uid) {
+      handleList();
+      handleListYears();
+    }
+  }, [uid]);
+
+  React.useEffect(() => {
+    setData([]);
   }, [open]);
 
   // eslint-disable-next-line no-shadow
@@ -104,7 +123,7 @@ export default function ModalViewObservations({ uid, open, handleClose }) {
   return (
     <div>
       <Dialog
-        maxWidth="sm"
+        maxWidth="md"
         fullScreen={screen.width < 600}
         open={open}
         TransitionComponent={Transition}
@@ -117,16 +136,78 @@ export default function ModalViewObservations({ uid, open, handleClose }) {
       >
         <DialogTitle sx={{ fontSize: '1.5em' }}>Observaciones del estudiante</DialogTitle>
         <DialogContent>
+          <Box sx={{ display: 'flex' }}>
+            <Box sx={{ width: '100%', padding: '3px' }}>
+              <CustomFormLabel htmlFor="institution">Año</CustomFormLabel>
+              <CustomSelect
+                id="date"
+                name="date"
+                fullWidth
+                variant="outlined"
+                size="small"
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 300,
+                      overflow: 'auto',
+                    },
+                  },
+                }}
+                onChange={(e) => setDate(e.target.value)}
+                value={date}
+              >
+                {years.map((year) => (
+                  <MenuItem key={year} value={year}>
+                    {year}
+                  </MenuItem>
+                ))}
+              </CustomSelect>
+            </Box>
+            <Box sx={{ width: '100%', padding: '3px' }}>
+              <CustomFormLabel htmlFor="institution">Semestre</CustomFormLabel>
+              <CustomSelect
+                id="semester"
+                name="semester"
+                fullWidth
+                variant="outlined"
+                size="small"
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 300,
+                      overflow: 'auto',
+                    },
+                  },
+                }}
+                onChange={(e) => setSemester(e.target.value)}
+                value={semester}
+              >
+                <MenuItem value="1">1</MenuItem>
+                <MenuItem value="2">2</MenuItem>
+              </CustomSelect>
+            </Box>
+            <Box
+              sx={{
+                width: '25%',
+                padding: '3px',
+                marginTop: 'auto',
+              }}
+            >
+              <IconButton variant="contained" color="primary" onClick={handleList}>
+                <SendIcon fontSize="inherit" />
+              </IconButton>
+            </Box>
+          </Box>
           {data.length === 0 ? (
             <Typography textAlign="center">Sin Observaciones</Typography>
           ) : (
             data.map((dato) => {
               const dateTimestamp = Date.parse(dato.createdAt);
-              const date = new Date(dateTimestamp);
+              const dateParse = new Date(dateTimestamp);
 
-              const year = date.getFullYear();
-              let month = date.getMonth() + 1;
-              let day = date.getDate();
+              const year = dateParse.getFullYear();
+              let month = dateParse.getMonth() + 1;
+              let day = dateParse.getDate();
 
               if (month < 10) {
                 month = '0' + month;
@@ -136,8 +217,8 @@ export default function ModalViewObservations({ uid, open, handleClose }) {
                 day = '0' + day;
               }
 
-              let hour = date.getHours();
-              let minutes = date.getMinutes();
+              let hour = dateParse.getHours();
+              let minutes = dateParse.getMinutes();
 
               if (hour < 10) {
                 hour = '0' + hour;
@@ -154,6 +235,7 @@ export default function ModalViewObservations({ uid, open, handleClose }) {
                 <Card
                   sx={{
                     marginX: '0',
+                    width: '750px',
                   }}
                 >
                   <Box display="flex" justifyContent="space-between">
@@ -208,7 +290,7 @@ export default function ModalViewObservations({ uid, open, handleClose }) {
                   <Typography variant="body2" my={3}>
                     {dato.body}
                   </Typography>
-                  <Box display='flex' alignItems='center'> 
+                  <Box display="flex" alignItems="center">
                     <Avatar
                       sx={{
                         backgroundColor: (theme) => theme.palette.primary.main,
