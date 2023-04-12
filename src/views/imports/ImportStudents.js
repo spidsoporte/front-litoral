@@ -166,15 +166,31 @@ const Import = () => {
       if (body.statusCode === 401) {
         dispatch(logout());
       }
-      if (body.statusCode === 400) {
-        error = body.datatemp;
+      if (body.message ?? body.msg === '[0].Edad is not allowed') {
+        AlertError('El campo edad no es permitido, es calculada automaticamente');
       }
+      if (body.statusCode === 400) {
+        if (body.datatemp) {
+          error = body.datatemp;
+        } else {
+          error = {
+            'Error de cargue': [{ 'Consultar con administrador': {} }],
+          };
+        }
+      }
+
       if (body.statusCode === 410) {
-        error = body.datatemp;
+        if (body.datatemp) {
+          error = body.datatemp;
+        } else {
+          error = {
+            'Error de cargue': [{ 'Consultar con administrador': {} }],
+          };
+        }
       }
       if (body.statusCode === 500) {
-        error = { 
-          'Error de cargue': [{ 'Consultar con administrador': {} }] 
+        error = {
+          'Error de cargue': [{ 'Consultar con administrador': {} }],
         };
         AlertError(body.msg);
       }
