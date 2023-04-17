@@ -1,3 +1,4 @@
+/* eslint-disable import/extensions */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable array-callback-return */
@@ -36,6 +37,7 @@ import CustomFormLabel from '../../components/forms/custom-elements/CustomFormLa
 import { FetchTokenized } from '../../services/Fetch';
 import { logout } from '../../redux/auth/Action';
 import excel from '../../assets/files/Plantilla para el cargue de estudiantes.xlsx';
+import ModalCleanData from './ModalCleanData';
 
 const steps = ['Archivos', 'Finalizar'];
 
@@ -50,6 +52,7 @@ const Import = () => {
   const [filesName, setFilesName] = React.useState([]);
   const [fileError, setFileError] = React.useState(false);
   const [errors, setErrors] = React.useState([]);
+  const [open, setOpen] = React.useState(false);
   const dispatch = useDispatch();
 
   const isStepOptional = (step) => step === 1;
@@ -72,6 +75,9 @@ const Import = () => {
     setDataFiles([]);
     setFilesName([]);
   };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const handleChange = (e) => {
     if (e.target.files[0]) {
@@ -80,7 +86,7 @@ const Import = () => {
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       ) {
         setFileError(false);
-        setFiles([...files, e.target.files[0]]);
+        setFiles([e.target.files[0]]);
       } else {
         setFileError(true);
       }
@@ -163,13 +169,15 @@ const Import = () => {
         AlertError(err),
       );
       const body = await res.json();
+      Swal.close();
+      if (body.statusCode === 200) {
+        setOpen(true);
+      }
       if (body.statusCode === 401) {
         dispatch(logout());
       }
-      if (body.message ?? body.msg === '[0].Edad is not allowed') {
-        AlertError('El campo edad no es permitido, es calculada automaticamente');
-      }
       if (body.statusCode === 400) {
+        AlertError(body.message);
         if (body.datatemp) {
           error = body.datatemp;
         } else {
@@ -180,6 +188,7 @@ const Import = () => {
       }
 
       if (body.statusCode === 410) {
+        AlertError(body.message);
         if (body.datatemp) {
           error = body.datatemp;
         } else {
@@ -195,7 +204,6 @@ const Import = () => {
         AlertError(body.msg);
       }
       setErrors((errors) => [...errors, error]);
-      Swal.close();
     }
     handleNext();
   };
@@ -500,6 +508,7 @@ const Import = () => {
           )}
         </Box>
       </Card>
+      <ModalCleanData open={open} handleClose={handleClose} data={dataFiles[0]} />
     </PageContainer>
   );
 };
