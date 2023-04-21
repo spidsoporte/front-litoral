@@ -29,6 +29,7 @@ const MonthlyReport = Loadable(lazy(() => import('../views/reports/MonthlyReport
 const DesertionReport = Loadable(lazy(() => import('../views/reports/DesertionReport')));
 const ImportStudents = Loadable(lazy(() => import('../views/imports/ImportStudents')));
 const ImportAttendance = Loadable(lazy(() => import('../views/imports/ImportAttendance')));
+const ImportAttendanceMonthly = Loadable(lazy(() => import('../views/imports/ImportAttendanceMonthly')));
 
 /* ****Routes***** */
 const Router = [
@@ -124,6 +125,15 @@ const Router = [
         element: (
           <PrivateRoute permissions={['ADMINISTRADOR', 'DOCENTE', 'PSICOLOGO', 'COORDINADOR', 'EXTERNO']}>
             <ImportAttendance />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: '/students/import/attendance-monthly',
+        exact: true,
+        element: (
+          <PrivateRoute permissions={['ADMINISTRADOR', 'DOCENTE', 'PSICOLOGO', 'COORDINADOR', 'EXTERNO']}>
+            <ImportAttendanceMonthly />
           </PrivateRoute>
         ),
       },

@@ -90,9 +90,15 @@ const Menuitems = [
         permissions: ['ADMINISTRADOR', 'DOCENTE', 'PSICOLOGO', 'COORDINADOR', 'EXTERNO'],
       },
       {
-        title: 'Importacion de asistencias',
+        title: 'Importacion de asistencias diarias',
         icon: 'upload',
         href: '/students/import/attendance',
+        permissions: ['ADMINISTRADOR', 'DOCENTE', 'PSICOLOGO', 'COORDINADOR', 'EXTERNO'],
+      },
+      {
+        title: 'Importacion de asistencias mensuales',
+        icon: 'upload',
+        href: '/students/import/attendance-monthly',
         permissions: ['ADMINISTRADOR', 'DOCENTE', 'PSICOLOGO', 'COORDINADOR', 'EXTERNO'],
       },
     ],

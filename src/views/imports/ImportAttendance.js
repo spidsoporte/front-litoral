@@ -26,7 +26,6 @@ import UploadFile from '@mui/icons-material/UploadFile';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import FeatherIcon from 'feather-icons-react';
 import { useDispatch, useSelector } from 'react-redux';
-
 import Swal from 'sweetalert2';
 import {
   AlertCharging,
@@ -48,7 +47,7 @@ const Import = () => {
   const [render, setRender] = React.useState(true);
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
-  const { token } = useSelector((state) => state.auth.user);
+  const { token , user} = useSelector((state) => state.auth.user);
   // Archivo
   const [files, setFiles] = React.useState([]);
   const [dataFiles, setDataFiles] = React.useState([]);
@@ -57,6 +56,7 @@ const Import = () => {
   const [errors, setErrors] = React.useState([]);
   const [errorsValidate, setErrorsValidate] = React.useState([]);
   const [validate, setValidate] = React.useState(false);
+  const [logData, setLogData] = React.useState();
   const dispatch = useDispatch();
   const isStepOptional = (step) => step === 1;
 
@@ -94,15 +94,46 @@ const Import = () => {
     }
   };
 
+  // Funcion para la convertir un objeto date (Tue Dec 13 2016 00:00:00 GMT-0500) en string (2016-12-13)
+  const parseDate = (date) => {
+    const year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+
+    if (month < 10) {
+      month = `0${month}`;
+    }
+    if (day < 10) {
+      day = `0${day}`;
+    }
+
+    return `${year}-${month}-${day}`;
+  };
+
+  // funcion para enviar los datos al banco de logs
+  const saveLog = async () => {
+    const res = await FetchTokenized('user/createArchivo', token, logData, 'POST').catch((err) =>
+      console.log(err),
+    );
+    const body = await res.json();
+    if (body.statusCode === 200) {
+      console.log(body);
+    }
+    if (body.statusCode === 400) {
+      console.log(body);
+    }
+    if (body.statusCode === 401) {
+      dispatch(logout());
+    }
+  };
+
   const handlePreview = async () => {
     handleNext();
-
-    const excelEpoc = new Date(1900, 0, -1).getTime();
-    const msDay = 86400000;
 
     for (let i = 0; i < files.length; i++) {
       AlertCharging();
       // eslint-disable-next-line no-await-in-loop
+      let dataFile;
       const promise = new Promise((resolve, reject) => {
         const fileReader = new FileReader();
         fileReader.readAsArrayBuffer(files[i]);
@@ -110,33 +141,18 @@ const Import = () => {
 
         fileReader.onload = (e) => {
           const bufferArray = e.target.result;
-          const wb = XLSX.read(bufferArray, { type: 'buffer' });
+          const wb = XLSX.read(bufferArray, { type: 'buffer', cellDates: true });
           const wsname = wb.SheetNames[0];
           const ws = wb.Sheets[wsname];
-          const data = XLSX.utils.sheet_to_json(ws);
+          dataFile = XLSX.utils.sheet_to_json(ws);
 
           const jDatos = [];
-          for (let i = 0; i < data.length; i++) {
-            const dato = data[i];
+          for (let i = 0; i < dataFile.length; i++) {
+            const dato = dataFile[i];
             let date = null;
+
             if (dato.fecha) {
-              // const date = new Date(dato.fecha).todateLocaleDateString();
-              const dateConvert = new Date(excelEpoc + dato.fecha * msDay);
-              const dateParse = Date.parse(dateConvert);
-              const finaldate = new Date(dateParse);
-
-              const year = finaldate.getUTCFullYear();
-              let month = finaldate.getUTCMonth() + 1;
-              let day = finaldate.getUTCDate();
-
-              if (month < 10) {
-                month = `0${month}`;
-              }
-              if (day < 10) {
-                day = `0${day}`;
-              }
-
-              date = `${year}-${month}-${day}`;
+              date = parseDate(dato.fecha);
             }
 
             jDatos.push({
@@ -155,6 +171,13 @@ const Import = () => {
       // eslint-disable-next-line no-await-in-loop
       await promise.then((data) => {
         setDataFiles((dataFiles) => [...dataFiles, data]);
+        const { asistencencia, Identificación, ...data2 } = data[0];
+        setLogData({
+          ...data2,
+          fechaOriginal: dataFile[0].fecha,
+          fechaCreacion: '',
+          user: user.name,
+        });
         Swal.close();
       });
     }
@@ -163,6 +186,7 @@ const Import = () => {
 
   const handleImport = async () => {
     setValidate(false);
+    saveLog();
     for (let i = 0; i < dataFiles.length; i++) {
       const file = dataFiles[i];
       const error = [];
@@ -227,8 +251,9 @@ const Import = () => {
         if (body.msg === 'Excel denied') {
           setErrorsValidate((errorsValidate) => [...errorsValidate, body.datatemp]);
           handleNext();
-        } else {
-          AlertError(body.msg);
+        }
+        if (body.msg === 'Duplicate attendance') {
+          AlertError('Esta asistencia ya se encuentra registrada');
         }
       }
     }
@@ -377,22 +402,22 @@ const Import = () => {
 
   const BCrumb = [
     {
-      title: 'Reporte',
+      title: 'Reportes',
     },
     {
       title: 'Importaciones',
     },
     {
-      title: 'Importacion de asistencias',
+      title: 'Importacion de asistencias diarias',
     },
   ];
 
   return (
     <PageContainer title="SPID | Importacion">
-      <Breadcrumb title="Importar asistencias (Excel)" items={BCrumb} />
+      <Breadcrumb title="Importar asistencias diarias (Excel)" items={BCrumb} />
       <Card>
         <CardContent>
-          <Typography variant="h3">Plantilla de excel para importar asistencias</Typography>
+          <Typography variant="h3">Plantilla de excel para importar asistencias diarias</Typography>
           <Typography my={1}>
             Por favor leer y seguir las instrucciones para evitar errores en el cargue de la
             informacion a las bases de datos
