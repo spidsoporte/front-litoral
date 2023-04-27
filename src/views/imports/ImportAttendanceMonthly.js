@@ -40,7 +40,7 @@ import Breadcrumb from '../../layouts/full-layout/breadcrumb/Breadcrumb';
 import CustomFormLabel from '../../components/forms/custom-elements/CustomFormLabel';
 import { FetchTokenized } from '../../services/Fetch';
 import { logout } from '../../redux/auth/Action';
-import excel from '../../assets/files/Plantilla para el cargue de asistencias.xlsx';
+import excel from '../../assets/files/Plantilla para el cargue de asistencias mensuales.xlsx';
 
 const steps = ['Archivos', 'Finalizar'];
 
